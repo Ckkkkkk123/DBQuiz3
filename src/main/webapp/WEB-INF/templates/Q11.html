@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>index</title>
+    <!--引入bootstrap和jquery-->
+    <link rel="stylesheet" th:href="@{/static/bootstrap-3.4.1-dist/css/bootstrap.min.css}">
+    <script th:src="@{/static/js/jquery-3.6.1.min.js}"></script>
+    <script th:src="@{/static/bootstrap-3.4.1-dist/js/bootstrap.min.js}"></script>
+    <script th:src="@{/static/js/echarts.min.js}"></script>
+</head>
+<body>
+<h2 align="center" style="color: rebeccapurple">Jianxiang Wang</h2>
+<h2 align="center" style="color: rebeccapurple">91890</h2>
+<!-- 选项卡菜单-->
+<nav class="navbar navbar-dark bg-success" role="navigation" >
+    <div class="container-fluid">
+        <ul class="nav navbar-nav" align="center">
+            <li><a th:href="@{/}"><span class="glyphicon glyphicon-home"></span> My Home</a></li>
+            <li><a th:href="@{/q10}"><span class="glyphicon glyphicon-paperclip"></span> Q 10</a></li>
+            <li><a th:href="@{/q11}"><span class="glyphicon glyphicon-time"></span> Q 11</a></li>
+            <li><a th:href="@{/q12}"><span class="glyphicon glyphicon-map-marker"></span> Q 12</a></li>
+        </ul>
+    </div>
+</nav>
+<!--<h3>Question 10:</h3>-->
+<!--<div id="question10_div" style="margin-bottom: 5px; margin-left: 5px;">-->
+<!--    <input type="text" id="text4" onblur="question10()" maxlength="800"><br>-->
+<!--    <span id="question10_span"></span>-->
+<!--</div>-->
+
+<h3 align="center" style="color: blue">Q 11, please click the blank space of the page after completing the input</h3>
+<div style="display: grid; place-items: center;">
+<div id="question11_div" style="margin-bottom: 5px; margin-left: 5px;">
+
+    <textarea name="content" rows="6" cols="80" onpropertychange="if(this.scrollHeight>80) this.style.posHeight=this.scrollHeight+5" id="text2" onblur="question11()" maxlength="800">
+    </textarea>
+        <!--    <input type="text" style="display:block;" id="text2" maxlength="800">-->
+    <input type="text" style="display:block;" id="text3" onblur="question11()" maxlength="800"><br>
+    <span id="question11_span"></span>
+</div>
+</div>
+<!--<h3>Question 12:</h3>-->
+<!--<div id="question12_div" style="margin-bottom: 5px; margin-left: 5px;">-->
+<!--    <input type="text" id="text1" onblur="question12()" maxlength="800"><br>-->
+<!--    <span id="question12_span"></span>-->
+<!--</div>-->
+
+<!--<h3>Question 13:</h3>-->
+<!--<div id="chart" style="width: 600px; height: 600px;"></div>-->
+</body>
+<script th:inline="javascript">
+    function question13(data) {
+        var newData = [];
+        for(var key in data) {
+            var temp = {"name":"","value":0};
+            temp.name = key;
+            temp.value = data[key];
+            newData.push(temp);
+        }
+        console.log(newData);
+        var chart = echarts.init(document.getElementById("chart"));
+        var option = {
+            tooltip: {
+                trigger: 'item'
+            },
+            legend: {
+                top: '5%',
+                left: 'center'
+            },
+            series: [
+                {
+                    name: 'Words Count',
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: {
+                        borderRadius: 10,
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    },
+                    label: {
+                        show: false,
+                        position: 'center'
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: '40',
+                            fontWeight: 'bold'
+                        }
+                    },
+                    labelLine: {
+                        show: false
+                    },
+                    data: newData
+                }
+            ]
+        };
+        chart.setOption(option);
+    }
+
+    function question10() {
+        var reqUrl = [[@{/question10}]];
+            $.get({
+                url:reqUrl,
+                data:{"words":$("#text4").val()},
+                dataType:"json",
+                success:function (data) {
+                    console.log(JSON.stringify(data));
+                    $("#question10_span").text(JSON.stringify(data));
+                    question13(data);
+                }
+            });
+    }
+        function question11() {
+            var reqUrl = [[@{/question11}]];
+                $.get({
+                    url:reqUrl,
+                    data:{"text2":$("#text2").val(),"text3":$("#text3").val()},
+                    dataType:"json",
+                    success:function (data) {
+                        console.log(data);
+                        // $("#text1_span").text(JSON.stringify(data));
+                        var text = "";
+                        for(var key in data) {
+                            if (data[key].length === 0) {
+                                text += key + " -> " + data[key].length + " times, " + "first occurance " + 0 + ";";
+                            }else {
+                                text += key + " -> " + data[key].length + " times, " + "first occurance " + data[key][0] + ";";
+                            }
+                        }
+                        $("#question11_span").text(text);
+                    }
+                });
+        }
+
+            function question12() {
+                var reqUrl = [[@{/question12}]];
+                    $.get({
+                        url:reqUrl,
+                        data:{"words":$("#text1").val()},
+                        dataType:"json",
+                        success:function (data) {
+                            console.log(JSON.stringify(data));
+                            $("#question12_span").text(JSON.stringify(data));
+                        }
+                    });
+            }
+
+</script>
+</html>
